@@ -42,6 +42,7 @@ android {
 
 dependencies {
     // Compose базовые
+    implementation("androidx.compose.material:material-icons-extended")
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.compose.material3)
@@ -59,6 +60,7 @@ dependencies {
 
     // Корутины — асинхронные запросы (сеть, Firebase)
     implementation(libs.kotlinx.coroutines.android)
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.3")
 
     // Coil — загрузка фото из Firebase Storage
     implementation(libs.coil.compose)
