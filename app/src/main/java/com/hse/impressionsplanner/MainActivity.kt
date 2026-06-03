@@ -18,6 +18,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.FirebaseFirestoreSettings
 import com.hse.impressionsplanner.ui.auth.AuthViewModel
 import com.hse.impressionsplanner.ui.constructor.ConstructorScreen
 import com.hse.impressionsplanner.ui.diary.DiaryScreen
@@ -28,6 +30,13 @@ import com.hse.impressionsplanner.ui.theme.ImpressionsPlannerTheme
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // локальный кэш Firestore
+        FirebaseFirestore.getInstance().firestoreSettings =
+            FirebaseFirestoreSettings.Builder()
+                .setPersistenceEnabled(true)
+                .build()
+
         enableEdgeToEdge()
         setContent {
             ImpressionsPlannerTheme {
