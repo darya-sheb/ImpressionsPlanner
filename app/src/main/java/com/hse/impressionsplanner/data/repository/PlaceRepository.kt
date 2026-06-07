@@ -22,7 +22,6 @@ class PlaceRepository {
                         description = doc.getString("description") ?: "",
                         category = doc.getString("category") ?: "",
                         imageUrl = doc.getString("imageUrl") ?: "",
-                        rating = (doc.getDouble("rating") ?: 0.0).toFloat(),
                         address = doc.getString("address") ?: ""
                     )
                 }
@@ -49,7 +48,6 @@ class PlaceRepository {
                         description = doc.getString("description") ?: "",
                         imageUrl = doc.getString("imageUrl") ?: "",
                         duration = doc.getString("duration") ?: "",
-                        rating = (doc.getDouble("rating") ?: 0.0).toFloat(),
                         placeCount = (doc.getLong("placeCount") ?: 0).toInt()
                     )
                 }
@@ -73,7 +71,6 @@ class PlaceRepository {
                     "description" to place.description,
                     "category" to place.category,
                     "imageUrl" to place.imageUrl,
-                    "rating" to place.rating,
                     "address" to place.address
                 )
             ).await()
@@ -88,7 +85,6 @@ class PlaceRepository {
                     "description" to route.description,
                     "imageUrl" to route.imageUrl,
                     "duration" to route.duration,
-                    "rating" to route.rating,
                     "placeCount" to route.placeCount
                 )
             ).await()

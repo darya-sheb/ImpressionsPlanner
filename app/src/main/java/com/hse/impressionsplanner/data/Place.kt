@@ -6,7 +6,6 @@ data class Place(
     val description: String,
     val category: String,
     val imageUrl: String,
-    val rating: Float,
     val address: String
 )
 
@@ -17,7 +16,6 @@ val samplePlaces = listOf(
         "Крупнейший музей русского искусства",
         "Музеи",
         "https://upload.wikimedia.org/wikipedia/commons/thumb/5/58/GTG_Moscow_August_2009.jpg/800px-GTG_Moscow_August_2009.jpg",
-        4.8f,
         "Лаврушинский пер., 10"
     ),
     Place(
@@ -26,7 +24,6 @@ val samplePlaces = listOf(
         "Главный парк культуры и отдыха Москвы",
         "Парки",
         "https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/Park_Gor%27kogo.jpg/800px-Park_Gor%27kogo.jpg",
-        4.7f,
         "Крымский Вал, 9"
     ),
     Place(
@@ -35,7 +32,6 @@ val samplePlaces = listOf(
         "Легендарный московский ресторан русской кухни",
         "Рестораны",
         "https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/Cafe_Pushkin_Moscow.jpg/800px-Cafe_Pushkin_Moscow.jpg",
-        4.6f,
         "Тверской бул., 26А"
     ),
     Place(
@@ -44,7 +40,6 @@ val samplePlaces = listOf(
         "Главная площадь России, объект ЮНЕСКО",
         "Исторические места",
         "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4d/Red_Square%2C_Moscow%2C_Russia.jpg/800px-Red_Square%2C_Moscow%2C_Russia.jpg",
-        4.9f,
         "Красная пл., 1"
     ),
     Place(
@@ -53,7 +48,6 @@ val samplePlaces = listOf(
         "Дворцово-парковый ансамбль XVIII века",
         "Парки",
         "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8b/Tsaritsyno_palace_big_palace.jpg/800px-Tsaritsyno_palace_big_palace.jpg",
-        4.5f,
         "ул. Дольская, 1"
     ),
     Place(
@@ -62,7 +56,6 @@ val samplePlaces = listOf(
         "История освоения космоса и техника",
         "Музеи",
         "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Memorial_Museum_of_Cosmonautics_%28Moscow%29.jpg/800px-Memorial_Museum_of_Cosmonautics_%28Moscow%29.jpg",
-        4.7f,
         "просп. Мира, 111"
     ),
     Place(
@@ -71,7 +64,6 @@ val samplePlaces = listOf(
         "Смотровая площадка с панорамой города",
         "Исторические места",
         "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/Moscow_from_Sparrow_Hills.jpg/800px-Moscow_from_Sparrow_Hills.jpg",
-        4.6f,
         "Воробьёвское ш., 2"
     ),
     Place(
@@ -80,7 +72,6 @@ val samplePlaces = listOf(
         "Главный спортивный комплекс страны",
         "Развлечения",
         "https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/Luzhniki_Stadium_2018.jpg/800px-Luzhniki_Stadium_2018.jpg",
-        4.5f,
         "Лужники, 24"
     ),
     Place(
@@ -89,7 +80,6 @@ val samplePlaces = listOf(
         "Крупнейший музей западного искусства",
         "Музеи",
         "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/GMII_im_Pushkina.jpg/800px-GMII_im_Pushkina.jpg",
-        4.8f,
         "ул. Волхонка, 12"
     ),
     Place(
@@ -98,7 +88,6 @@ val samplePlaces = listOf(
         "Крупнейший лесопарк Москвы",
         "Парки",
         "https://upload.wikimedia.org/wikipedia/commons/thumb/3/31/Izmaylovsky_Park.jpg/800px-Izmaylovsky_Park.jpg",
-        4.4f,
         "Народный просп., 17"
     )
 )
