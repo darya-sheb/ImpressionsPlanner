@@ -2,16 +2,22 @@ package com.hse.impressionsplanner.ui.impressions
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import com.hse.impressionsplanner.data.Route
 import com.hse.impressionsplanner.data.repository.PlaceRepository
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 class ImpressionsViewModel : ViewModel() {
 
     private val repository = PlaceRepository()
+    private val db   = FirebaseFirestore.getInstance()
+    private val auth = FirebaseAuth.getInstance()
 
     private val _routes = MutableStateFlow<List<Route>>(emptyList())
     val routes: StateFlow<List<Route>> = _routes.asStateFlow()
@@ -22,9 +28,11 @@ class ImpressionsViewModel : ViewModel() {
     private val _isLoading = MutableStateFlow(true)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
-    init {
-        loadRoutes()
-    }
+    // Флаг «сохранено в дневник»
+    private val _savedToDiary = MutableStateFlow(false)
+    val savedToDiary: StateFlow<Boolean> = _savedToDiary.asStateFlow()
+
+    init { loadRoutes() }
 
     private fun loadRoutes() {
         viewModelScope.launch {
@@ -44,4 +52,26 @@ class ImpressionsViewModel : ViewModel() {
     }
 
     fun isSaved(routeId: String) = _savedRoutes.value.contains(routeId)
+
+    fun saveRouteToDiary(route: Route) {
+        val userId = auth.currentUser?.uid ?: return
+        viewModelScope.launch {
+            try {
+                db.collection("diary_entries").add(
+                    mapOf(
+                        "userId"   to userId,
+                        "date"     to System.currentTimeMillis(),
+                        "type"     to "ready",
+                        "raw_text" to route.description,
+                        "place"    to route.name,
+                        "summary"  to route.description
+                    )
+                ).await()
+            } catch (e: Exception) { }
+
+            _savedToDiary.value = true
+            delay(2_000)
+            _savedToDiary.value = false
+        }
+    }
 }
