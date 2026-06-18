@@ -2,11 +2,13 @@ package com.hse.impressionsplanner.ui.impressions
 
 import android.content.Intent
 import android.net.Uri
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -36,7 +38,10 @@ private val impressionTypeOptions = listOf(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ImpressionsScreen(viewModel: ImpressionsViewModel = viewModel()) {
+fun ImpressionsScreen(
+    viewModel: ImpressionsViewModel = viewModel(),
+    onNeedAuth: () -> Unit = {}
+) {
     val routes       by viewModel.routes.collectAsState()
     val isLoading    by viewModel.isLoading.collectAsState()
     val savedToDiary by viewModel.savedToDiary.collectAsState()
@@ -51,6 +56,10 @@ fun ImpressionsScreen(viewModel: ImpressionsViewModel = viewModel()) {
 
     LaunchedEffect(savedToDiary) {
         if (savedToDiary) snackbarHostState.showSnackbar("Маршрут сохранён в дневник")
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.needsAuthEvent.collect { onNeedAuth() }
     }
 
     val filteredRoutes = remember(routes, searchQuery, typeFilters) {
@@ -342,6 +351,49 @@ fun RouteDetailSheet(
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
+
+        // Список точек маршрута
+        if (route.points.isNotEmpty()) {
+            Spacer(Modifier.height(16.dp))
+            Text(
+                text  = "Точки маршрута",
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.SemiBold
+            )
+            Spacer(Modifier.height(8.dp))
+            route.points.forEachIndexed { idx, point ->
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(vertical = 4.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(24.dp)
+                            .clip(androidx.compose.foundation.shape.CircleShape)
+                            .background(MaterialTheme.colorScheme.primaryContainer),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text  = "${idx + 1}",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                        )
+                    }
+                    Spacer(Modifier.width(8.dp))
+                    Text(text = point, style = MaterialTheme.typography.bodyMedium)
+                }
+            }
+        }
+
+        // Контакт автора / источник
+        if (route.authorContact.isNotBlank()) {
+            Spacer(Modifier.height(8.dp))
+            Text(
+                text  = "Автор: ${route.authorContact}",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
 
         Spacer(Modifier.height(16.dp))
 

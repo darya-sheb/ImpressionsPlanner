@@ -115,6 +115,10 @@ class ConstructorViewModel : ViewModel() {
     private val _maxReachedEvent = MutableSharedFlow<Unit>(replay = 0)
     val maxReachedEvent: SharedFlow<Unit> = _maxReachedEvent.asSharedFlow()
 
+    // Событие "требуется авторизация"
+    private val _needsAuthEvent = MutableSharedFlow<Unit>(replay = 0)
+    val needsAuthEvent: SharedFlow<Unit> = _needsAuthEvent.asSharedFlow()
+
     init { loadPlaces() }
 
     private fun loadPlaces() {
@@ -175,35 +179,37 @@ class ConstructorViewModel : ViewModel() {
             "yandexmaps://maps.yandex.ru/?text=${places.first().address}"
 
         val userId = auth.currentUser?.uid
-        if (userId != null) {
-            viewModelScope.launch {
-                try {
-                    val placeNames = places.joinToString(", ") { it.name }
-                    val now = System.currentTimeMillis()
-                    db.collection("saved_routes").add(
-                        mapOf(
-                            "userId"   to userId,
-                            "placeIds" to places.map { it.id },
-                            "date"     to now,
-                            "type"     to "constructed"
-                        )
-                    ).await()
-                    // маршрут сохраняется в дневник
-                    db.collection("diary_entries").add(
-                        mapOf(
-                            "userId"   to userId,
-                            "date"     to now,
-                            "type"     to "constructed",
-                            "raw_text" to placeNames,
-                            "place"    to places.first().name,
-                            "summary"  to "Маршрут: $placeNames",
-                            "duration" to "${places.size} точек"
-                        )
-                    ).await()
-                } catch (_: Exception) { }
-            }
+        if (userId == null) {
+            // Незарегистрированный пользователь → перенаправление на авторизацию
+            viewModelScope.launch { _needsAuthEvent.emit(Unit) }
+            return
         }
 
-        viewModelScope.launch { _launchMapEvent.emit(yandexUri) }
+        viewModelScope.launch {
+            try {
+                val placeNames = places.joinToString(", ") { it.name }
+                val now = System.currentTimeMillis()
+                db.collection("saved_routes").add(
+                    mapOf(
+                        "userId"   to userId,
+                        "placeIds" to places.map { it.id },
+                        "date"     to now,
+                        "type"     to "constructed"
+                    )
+                ).await()
+                db.collection("diary_entries").add(
+                    mapOf(
+                        "userId"   to userId,
+                        "date"     to now,
+                        "type"     to "constructed",
+                        "raw_text" to placeNames,
+                        "place"    to places.first().name,
+                        "summary"  to "Маршрут: $placeNames",
+                        "duration" to "${places.size} точек"
+                    )
+                ).await()
+            } catch (_: Exception) { }
+            _launchMapEvent.emit(yandexUri)
+        }
     }
 }

@@ -8,6 +8,7 @@ data class DiaryEntry(
     val id: String = "",
     val userId: String = "",
     val date: Long = System.currentTimeMillis(),
+    val type: String = "impression",   // "impression" | "constructed" | "ready"
     val rawText: String = "",
     val place: String = "",
     val duration: String = "",

@@ -48,14 +48,16 @@ class PlaceRepository {
                 val snapshot = db.collection("ready_routes").get().await()
                 val docs = snapshot.documents.mapNotNull { doc ->
                     Route(
-                        id          = doc.id,
-                        name        = doc.getString("name") ?: return@mapNotNull null,
-                        description = doc.getString("description") ?: "",
-                        imageUrl    = doc.getString("imageUrl") ?: "",
-                        duration    = doc.getString("duration") ?: "",
-                        placeCount  = (doc.getLong("placeCount") ?: 0).toInt(),
-                        sourceUrl   = doc.getString("sourceUrl") ?: "",
-                        categories  = (doc.get("categories") as? List<*>)?.filterIsInstance<String>() ?: emptyList()
+                        id            = doc.id,
+                        name          = doc.getString("name") ?: return@mapNotNull null,
+                        description   = doc.getString("description") ?: "",
+                        imageUrl      = doc.getString("imageUrl") ?: "",
+                        duration      = doc.getString("duration") ?: "",
+                        placeCount    = (doc.getLong("placeCount") ?: 0).toInt(),
+                        sourceUrl     = doc.getString("sourceUrl") ?: "",
+                        categories    = (doc.get("categories") as? List<*>)?.filterIsInstance<String>() ?: emptyList(),
+                        points        = (doc.get("points") as? List<*>)?.filterIsInstance<String>() ?: emptyList(),
+                        authorContact = doc.getString("authorContact") ?: ""
                     )
                 }
                 val needsReseed = docs.size < sampleRoutes.size
@@ -97,8 +99,10 @@ class PlaceRepository {
                     "imageUrl"    to route.imageUrl,
                     "duration"    to route.duration,
                     "placeCount"  to route.placeCount,
-                    "sourceUrl"   to route.sourceUrl,
-                    "categories"  to route.categories
+                    "sourceUrl"     to route.sourceUrl,
+                    "categories"    to route.categories,
+                    "points"        to route.points,
+                    "authorContact" to route.authorContact
                 )
             ).await()
         }

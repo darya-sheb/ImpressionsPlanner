@@ -31,7 +31,10 @@ import com.hse.impressionsplanner.data.Place
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ConstructorScreen(vm: ConstructorViewModel = viewModel()) {
+fun ConstructorScreen(
+    vm: ConstructorViewModel = viewModel(),
+    onNeedAuth: () -> Unit = {}
+) {
     val searchQuery       by vm.searchQuery.collectAsState()
     val routePlaces       by vm.routePlaces.collectAsState()
     val isLoading         by vm.isLoading.collectAsState()
@@ -64,6 +67,11 @@ fun ConstructorScreen(vm: ConstructorViewModel = viewModel()) {
         vm.maxReachedEvent.collect {
             snackbarHostState.showSnackbar("Максимум 8 мест в маршруте")
         }
+    }
+
+    // Redirect на авторизацию для незарегистрированных
+    LaunchedEffect(Unit) {
+        vm.needsAuthEvent.collect { onNeedAuth() }
     }
 
     Scaffold(

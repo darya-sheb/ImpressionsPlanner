@@ -78,8 +78,20 @@ class MainActivity : ComponentActivity() {
                         startDestination = Screen.Constructor.route,
                         modifier = Modifier.padding(innerPadding)
                     ) {
-                        composable(Screen.Constructor.route) { ConstructorScreen() }
-                        composable(Screen.Impressions.route) { ImpressionsScreen() }
+                        composable(Screen.Constructor.route) {
+                            ConstructorScreen(onNeedAuth = {
+                                navController.navigate(Screen.Profile.route) {
+                                    launchSingleTop = true
+                                }
+                            })
+                        }
+                        composable(Screen.Impressions.route) {
+                            ImpressionsScreen(onNeedAuth = {
+                                navController.navigate(Screen.Profile.route) {
+                                    launchSingleTop = true
+                                }
+                            })
+                        }
                         composable(Screen.Diary.route) { DiaryScreen() }
                         composable(Screen.Profile.route) { ProfileScreen(authViewModel) }
                     }

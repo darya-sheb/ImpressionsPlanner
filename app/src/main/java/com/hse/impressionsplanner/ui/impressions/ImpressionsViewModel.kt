@@ -7,8 +7,11 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.hse.impressionsplanner.data.Route
 import com.hse.impressionsplanner.data.repository.PlaceRepository
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
@@ -32,6 +35,10 @@ class ImpressionsViewModel : ViewModel() {
     private val _savedToDiary = MutableStateFlow(false)
     val savedToDiary: StateFlow<Boolean> = _savedToDiary.asStateFlow()
 
+    // Событие «требуется авторизация»
+    private val _needsAuthEvent = MutableSharedFlow<Unit>(replay = 0)
+    val needsAuthEvent: SharedFlow<Unit> = _needsAuthEvent.asSharedFlow()
+
     init { loadRoutes() }
 
     private fun loadRoutes() {
@@ -54,7 +61,11 @@ class ImpressionsViewModel : ViewModel() {
     fun isSaved(routeId: String) = _savedRoutes.value.contains(routeId)
 
     fun saveRouteToDiary(route: Route) {
-        val userId = auth.currentUser?.uid ?: return
+        val userId = auth.currentUser?.uid
+        if (userId == null) {
+            viewModelScope.launch { _needsAuthEvent.emit(Unit) }
+            return
+        }
         viewModelScope.launch {
             try {
                 db.collection("diary_entries").add(

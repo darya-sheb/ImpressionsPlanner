@@ -26,6 +26,8 @@ class DiaryViewModel : ViewModel() {
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
+    val isAuthenticated: Boolean get() = auth.currentUser != null
+
     private val _showDialog = MutableStateFlow(false)
     val showDialog: StateFlow<Boolean> = _showDialog.asStateFlow()
 
@@ -61,6 +63,7 @@ class DiaryViewModel : ViewModel() {
                         id       = doc.id,
                         userId   = userId,
                         date     = doc.getLong("date") ?: System.currentTimeMillis(),
+                        type     = doc.getString("type") ?: "impression",
                         rawText  = doc.getString("raw_text") ?: "",
                         place    = doc.getString("place") ?: "",
                         duration = doc.getString("duration") ?: "",

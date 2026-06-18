@@ -23,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.hse.impressionsplanner.data.DiaryEntry
 import com.hse.impressionsplanner.data.repository.StructuredEntry
@@ -54,6 +55,29 @@ fun DiaryScreen(viewModel: DiaryViewModel = viewModel()) {
                 )
             }
         }
+    }
+
+    // заглушка для неавторизованных
+    if (!viewModel.isAuthenticated) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(32.dp)) {
+                Text("📔", fontSize = 48.sp)
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text      = "Дневник впечатлений",
+                    style     = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text      = "Войдите в аккаунт, чтобы хранить свои маршруты и впечатления",
+                    style     = MaterialTheme.typography.bodyMedium,
+                    color     = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                )
+            }
+        }
+        return
     }
 
     Scaffold(
@@ -286,58 +310,108 @@ fun DiaryEntryCard(
                 verticalAlignment     = Alignment.CenterVertically
             ) {
                 Column(modifier = Modifier.weight(1f)) {
-                    if (entry.place.isNotBlank()) {
+                    if (entry.type == "constructed" || entry.type == "ready") {
+                        // Карточка маршрута: «Маршрут от [дата]»
                         Text(
-                            text       = entry.place,
+                            text       = if (entry.type == "ready") entry.place
+                                         else "Маршрут от ${entry.formattedDate()}",
                             style      = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold
                         )
+                        if (entry.type == "constructed" && entry.duration.isNotBlank()) {
+                            Spacer(modifier = Modifier.height(2.dp))
+                            Text(
+                                text  = entry.duration,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        }
                         Spacer(modifier = Modifier.height(2.dp))
+                        Text(
+                            text  = entry.formattedDate(),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    } else {
+                        // Карточка впечатления
+                        if (entry.place.isNotBlank()) {
+                            Text(
+                                text       = entry.place,
+                                style      = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Spacer(modifier = Modifier.height(2.dp))
+                        }
+                        Text(
+                            text  = entry.formattedDate(),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
                     }
+                }
+
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    AssistChip(
+                        onClick = {},
+                        label = {
+                            Text(
+                                text  = when (entry.type) {
+                                    "constructed" -> "Маршрут"
+                                    "ready"       -> "Экскурсия"
+                                    else          -> "Впечатление"
+                                },
+                                style = MaterialTheme.typography.labelSmall
+                            )
+                        }
+                    )
+                    IconButton(onClick = onDelete) {
+                        Icon(
+                            Icons.Default.Delete,
+                            contentDescription = "Удалить",
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+            }
+
+            if (entry.type != "constructed") {
+                val meta = listOfNotNull(
+                    entry.weather.takeIf { it.isNotBlank() },
+                    entry.company.takeIf { it.isNotBlank() },
+                    entry.duration.takeIf { it.isNotBlank() }
+                ).joinToString(" · ")
+                if (meta.isNotBlank()) {
+                    Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text  = entry.formattedDate(),
+                        text  = meta,
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
-                IconButton(onClick = onDelete) {
-                    Icon(
-                        Icons.Default.Delete,
-                        contentDescription = "Удалить",
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-            }
 
-            // Метаданные (погода, компания)
-            val meta = listOfNotNull(
-                entry.weather.takeIf { it.isNotBlank() },
-                entry.company.takeIf { it.isNotBlank() },
-                entry.duration.takeIf { it.isNotBlank() }
-            ).joinToString(" · ")
-            if (meta.isNotBlank()) {
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(8.dp))
+
                 Text(
-                    text  = meta,
-                    style = MaterialTheme.typography.bodySmall,
+                    text  = entry.summary.ifBlank { entry.rawText },
+                    style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-            }
 
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Text(
-                text  = entry.summary.ifBlank { entry.rawText },
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-
-            if (entry.emotions.isNotBlank()) {
-                Spacer(modifier = Modifier.height(4.dp))
+                if (entry.emotions.isNotBlank()) {
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text  = entry.emotions,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.tertiary
+                    )
+                }
+            } else {
+                Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text  = entry.emotions,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.tertiary
+                    text  = entry.summary,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 2
                 )
             }
         }

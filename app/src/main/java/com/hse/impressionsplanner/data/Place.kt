@@ -104,38 +104,60 @@ data class Route(
     val duration: String,
     val placeCount: Int,
     val sourceUrl: String = "",
-    val categories: List<String> = emptyList()
+    val categories: List<String> = emptyList(),
+    val points: List<String> = emptyList(),
+    val authorContact: String = ""
 )
 
 val sampleRoutes = listOf(
     Route(
-        "r1", "Классическая Москва",
-        "Красная площадь, Кремль, ГУМ — обязательная программа для каждого",
-        "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4d/Red_Square%2C_Moscow%2C_Russia.jpg/800px-Red_Square%2C_Moscow%2C_Russia.jpg",
-        "4 часа", 5, "", listOf("Культура", "Исторический")
+        id = "r1",
+        name = "Классическая Москва",
+        description = "Красная площадь, Кремль, ГУМ — обязательная программа для каждого",
+        imageUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4d/Red_Square%2C_Moscow%2C_Russia.jpg/800px-Red_Square%2C_Moscow%2C_Russia.jpg",
+        duration = "4 часа", placeCount = 5,
+        categories = listOf("Культура", "Исторический"),
+        points = listOf("Красная площадь", "Кремль и Александровский сад", "ГУМ", "Манежная площадь", "Никольская улица"),
+        authorContact = "moscowwalks.ru"
     ),
     Route(
-        "r2", "Музейный weekend",
-        "Третьяковка, Пушкинский музей, Музей космонавтики",
-        "https://upload.wikimedia.org/wikipedia/commons/thumb/5/58/GTG_Moscow_August_2009.jpg/800px-GTG_Moscow_August_2009.jpg",
-        "6 часов", 3, "", listOf("Культура", "Спокойный")
+        id = "r2",
+        name = "Музейный weekend",
+        description = "Третьяковка, Пушкинский музей, Музей космонавтики",
+        imageUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/5/58/GTG_Moscow_August_2009.jpg/800px-GTG_Moscow_August_2009.jpg",
+        duration = "6 часов", placeCount = 3,
+        categories = listOf("Культура", "Спокойный"),
+        points = listOf("Третьяковская галерея", "Пушкинский музей изобразительных искусств", "Музей космонавтики"),
+        authorContact = "culture.moscow"
     ),
     Route(
-        "r3", "Парки и воздух",
-        "Парк Горького, Воробьёвы горы, Царицыно — прогулка на природе",
-        "https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/Park_Gor%27kogo.jpg/800px-Park_Gor%27kogo.jpg",
-        "5 часов", 3, "", listOf("Природа", "Спокойный")
+        id = "r3",
+        name = "Парки и воздух",
+        description = "Парк Горького, Воробьёвы горы, Царицыно — прогулка на природе",
+        imageUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/Park_Gor%27kogo.jpg/800px-Park_Gor%27kogo.jpg",
+        duration = "5 часов", placeCount = 3,
+        categories = listOf("Природа", "Спокойный"),
+        points = listOf("Парк Горького", "Воробьёвы горы (смотровая)", "Царицыно"),
+        authorContact = "parki.moscow"
     ),
     Route(
-        "r4", "Историческая прогулка",
-        "Измайлово, Царицыно, Воробьёвы горы",
-        "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/Moscow_from_Sparrow_Hills.jpg/800px-Moscow_from_Sparrow_Hills.jpg",
-        "7 часов", 3, "", listOf("Исторический", "Спокойный", "Природа")
+        id = "r4",
+        name = "Историческая прогулка",
+        description = "Измайлово, Царицыно, Воробьёвы горы",
+        imageUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/Moscow_from_Sparrow_Hills.jpg/800px-Moscow_from_Sparrow_Hills.jpg",
+        duration = "7 часов", placeCount = 3,
+        categories = listOf("Исторический", "Спокойный", "Природа"),
+        points = listOf("Измайловский Кремль", "Царицыно", "Воробьёвы горы"),
+        authorContact = "history-walks.ru"
     ),
     Route(
-        "r5", "Гастрономический тур",
-        "Лучшие рестораны и кафе в центре Москвы",
-        "https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/Cafe_Pushkin_Moscow.jpg/800px-Cafe_Pushkin_Moscow.jpg",
-        "3 часа", 4, "", listOf("Гастрономия")
+        id = "r5",
+        name = "Гастрономический тур",
+        description = "Лучшие рестораны и кафе в центре Москвы",
+        imageUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/Cafe_Pushkin_Moscow.jpg/800px-Cafe_Pushkin_Moscow.jpg",
+        duration = "3 часа", placeCount = 4,
+        categories = listOf("Гастрономия"),
+        points = listOf("Кафе Пушкинъ", "Ресторан Brasserie Мост", "Депо. Москва", "Рынок Усачевский"),
+        authorContact = "restoranoff.ru"
     )
 )
