@@ -24,9 +24,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 fun validateEmail(email: String): String? {
-    if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-        return "Некорректный email"
-    }
+    val emailRegex = Regex("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")
+    if (!emailRegex.matches(email)) return "Некорректный email"
     return null
 }
 

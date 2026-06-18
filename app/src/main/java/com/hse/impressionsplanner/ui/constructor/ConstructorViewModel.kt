@@ -22,7 +22,7 @@ val peopleFilterOptions = listOf("Все", "Один", "Пара", "Неболь
 val ageFilterOptions    = listOf("Дети (0-6)", "Школьники (7-12)", "Подростки (13-17)", "Взрослые (18+)", "Пенсионеры (65+)")
 val typeFilterOptions   = listOf("Активный", "Спокойный", "Экстрим", "Культура", "Гастрономия", "Природа")
 
-private val ageToCategories = mapOf(
+internal val ageToCategories = mapOf(
     "Дети (0-6)"       to setOf("Парки", "Развлечения"),
     "Школьники (7-12)" to setOf("Парки", "Музеи", "Развлечения"),
     "Подростки (13-17)" to setOf("Парки", "Музеи", "Развлечения", "Исторические места", "Рестораны"),
@@ -30,7 +30,7 @@ private val ageToCategories = mapOf(
     "Пенсионеры (65+)" to setOf("Музеи", "Парки", "Исторические места")
 )
 
-private val typeToCategories = mapOf(
+internal val typeToCategories = mapOf(
     "Активный"   to setOf("Развлечения", "Парки"),
     "Спокойный"  to setOf("Музеи", "Исторические места", "Рестораны", "Парки"),
     "Экстрим"    to setOf("Развлечения"),
@@ -39,11 +39,47 @@ private val typeToCategories = mapOf(
     "Природа"    to setOf("Парки")
 )
 
-private val peopleToCategories = mapOf(
+internal val peopleToCategories = mapOf(
     "Пара"              to setOf("Рестораны", "Исторические места", "Парки", "Музеи"),
     "Небольшая компания" to setOf("Парки", "Музеи", "Развлечения", "Рестораны"),
     "Большая компания"  to setOf("Парки", "Развлечения")
 )
+
+internal fun applyFilters(
+    places: List<Place>,
+    query: String,
+    people: String,
+    ages: Set<String>,
+    types: Set<String>
+): List<Place> {
+    var result = places
+    val allowedByPeople = peopleToCategories[people]
+    if (allowedByPeople != null) result = result.filter { it.category in allowedByPeople }
+    if (ages.isNotEmpty()) {
+        val allowed = ages.flatMap { ageToCategories[it] ?: emptySet() }.toSet()
+        result = result.filter { it.category in allowed }
+    }
+    if (types.isNotEmpty()) {
+        val allowed = types.flatMap { typeToCategories[it] ?: emptySet() }.toSet()
+        result = result.filter { it.category in allowed }
+    }
+    if (query.isNotBlank()) {
+        result = result.filter {
+            it.name.contains(query, ignoreCase = true) ||
+            it.address.contains(query, ignoreCase = true)
+        }
+    }
+    return result
+}
+
+internal fun buildYandexUri(places: List<Place>): String {
+    val points = places.filter { it.lat != 0.0 && it.lon != 0.0 }
+        .joinToString("~") { "${it.lat},${it.lon}" }
+    return if (points.isNotBlank())
+        "yandexmaps://maps.yandex.ru/?rtext=$points&rtt=pd"
+    else
+        "yandexmaps://maps.yandex.ru/?text=${places.first().address}"
+}
 
 class ConstructorViewModel : ViewModel() {
 
@@ -75,30 +111,7 @@ class ConstructorViewModel : ViewModel() {
     val filteredPlaces: StateFlow<List<Place>> = combine(
         _allPlaces, _searchQuery, _peopleFilter, _ageFilters, _typeFilters
     ) { places, query, people, ages, types ->
-        var result = places
-
-        val allowedByPeople = peopleToCategories[people]
-        if (allowedByPeople != null) {
-            result = result.filter { it.category in allowedByPeople }
-        }
-
-        if (ages.isNotEmpty()) {
-            val allowed = ages.flatMap { ageToCategories[it] ?: emptySet() }.toSet()
-            result = result.filter { it.category in allowed }
-        }
-
-        if (types.isNotEmpty()) {
-            val allowed = types.flatMap { typeToCategories[it] ?: emptySet() }.toSet()
-            result = result.filter { it.category in allowed }
-        }
-
-        if (query.isNotBlank()) {
-            result = result.filter {
-                it.name.contains(query, ignoreCase = true) ||
-                it.address.contains(query, ignoreCase = true)
-            }
-        }
-        result
+        applyFilters(places, query, people, ages, types)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     private val _routePlaces = MutableStateFlow<List<Place>>(emptyList())
@@ -170,13 +183,7 @@ class ConstructorViewModel : ViewModel() {
         val places = _routePlaces.value
         if (places.isEmpty()) return
 
-        val points = places.filter { it.lat != 0.0 && it.lon != 0.0 }
-            .joinToString("~") { "${it.lat},${it.lon}" }
-
-        val yandexUri = if (points.isNotBlank())
-            "yandexmaps://maps.yandex.ru/?rtext=$points&rtt=pd"
-        else
-            "yandexmaps://maps.yandex.ru/?text=${places.first().address}"
+        val yandexUri = buildYandexUri(places)
 
         val userId = auth.currentUser?.uid
         if (userId == null) {

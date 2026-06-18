@@ -17,6 +17,21 @@ import java.util.concurrent.TimeUnit
 import javax.net.ssl.SSLContext
 import javax.net.ssl.X509TrustManager
 
+internal fun parseGigaChatJson(content: String, rawText: String): StructuredEntry {
+    val parsed = JSONObject(content.trim())
+    return StructuredEntry(
+        place    = parsed.optString("place", ""),
+        duration = parsed.optString("duration", ""),
+        company  = parsed.optString("company", ""),
+        weather  = parsed.optString("weather", ""),
+        food     = parsed.optString("food", ""),
+        surprise = parsed.optString("surprise", ""),
+        emotions = parsed.optString("emotions", ""),
+        summary  = parsed.optString("summary", rawText),
+        rawText  = rawText
+    )
+}
+
 data class StructuredEntry(
     val place: String,
     val duration: String,
@@ -106,18 +121,7 @@ class GigaChatRepository {
                 .getJSONObject("message")
                 .getString("content")
 
-            val parsed = JSONObject(content.trim())
-            StructuredEntry(
-                place    = parsed.optString("place", ""),
-                duration = parsed.optString("duration", ""),
-                company  = parsed.optString("company", ""),
-                weather  = parsed.optString("weather", ""),
-                food     = parsed.optString("food", ""),
-                surprise = parsed.optString("surprise", ""),
-                emotions = parsed.optString("emotions", ""),
-                summary  = parsed.optString("summary", rawText),
-                rawText  = rawText
-            )
+            parseGigaChatJson(content, rawText)
         }
 
     suspend fun structureEntry(rawText: String): StructuredEntry {
